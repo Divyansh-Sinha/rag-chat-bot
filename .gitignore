@@ -1,0 +1,17 @@
+# Ignore config files
+config.py
+# Ignore environment variable files
+.env
+.env.*
+# Ignore Python cache files
+__pycache__/
+*.py[cod]
+# Ignore virtual environment directories
+venv/
+env/    
+.venv/
+# Ignore IDE specific files
+.vscode/
+.idea/
+# Ignore Jupyter Notebook checkpoints
+.ipynb_checkpoints/
