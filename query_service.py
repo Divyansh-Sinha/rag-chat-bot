@@ -4,7 +4,7 @@ from langgraph.graph import StateGraph, END
 from config import config
 from embedding_service import embedding_service
 from vector_store import vector_store
-
+from logging_config import logger
 
 class DataFetchingTool:
     """Tool for fetching additional data from configured sources"""
@@ -17,6 +17,7 @@ class DataFetchingTool:
         Fetch additional data based on configuration
         Currently supports local vector database search
         """
+        logger.info(f"Fetching data for query: {state['query']}")
         try:
             # Create embedding for the query (returns list, take first element)
             query_embeddings = embedding_service.create_embeddings([state["query"]])
@@ -24,6 +25,7 @@ class DataFetchingTool:
             
             # Search in vector store
             results = vector_store.search(query_embedding, k=5)
+            logger.info(f"Found {len(results)} relevant documents.")
             
             # Update state with results
             state["retrieved_docs"] = results
@@ -37,7 +39,7 @@ class DataFetchingTool:
             
             return state
         except Exception as e:
-            print(f"Data fetching error: {str(e)}")
+            logger.error(f"Data fetching error: {str(e)}", exc_info=True)
             state["retrieved_docs"] = []
             state["context"] = ""
             return state
@@ -53,6 +55,7 @@ class QueryAnsweringTool:
         """
         Generate answer using OpenAI GPT model with retrieved context
         """
+        logger.info("Generating answer...")
         try:
             # Prepare prompt with context and query
             prompt = f"""
@@ -78,9 +81,11 @@ class QueryAnsweringTool:
             )
             
             state["answer"] = response.choices[0].message.content
+            logger.info("Answer generated successfully.")
             return state
             
         except Exception as e:
+            logger.error(f"Error generating answer: {str(e)}", exc_info=True)
             state["answer"] = f"Error generating answer: {str(e)}"
             return state
 
@@ -113,6 +118,7 @@ class RAGOrchestrator:
         """
         Process a user query through the RAG pipeline
         """
+        logger.info(f"Processing query: {query}")
         try:
             # Initialize state as a dict
             initial_state = {
@@ -139,9 +145,11 @@ class RAGOrchestrator:
                 "context_used": len(final_state.get("retrieved_docs", [])) > 0
             }
             
+            logger.info("Query processed successfully.")
             return response
             
         except Exception as e:
+            logger.error(f"Error processing query: {str(e)}", exc_info=True)
             return {
                 "answer": f"Error processing query: {str(e)}",
                 "sources": [],

@@ -1,8 +1,11 @@
-from fastapi import FastAPI, HTTPException, File, UploadFile
+from fastapi import FastAPI, HTTPException, File, UploadFile, Request
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 from typing import List
 import json
+import time
+
+from logging_config import logger
 
 from models import DocumentUpload, QueryRequest, QueryResponse, APIResponse
 from embedding_service import embedding_service
@@ -25,6 +28,21 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+@app.middleware("http")
+async def log_requests(request: Request, call_next):
+    """
+    Log incoming requests and their processing time.
+    """
+    start_time = time.time()
+    logger.info(f"Request: {request.method} {request.url.path}")
+    
+    response = await call_next(request)
+    
+    process_time = time.time() - start_time
+    logger.info(f"Response: {response.status_code} - Process time: {process_time:.4f}s")
+    
+    return response
 
 @app.get("/")
 async def root():
@@ -57,6 +75,7 @@ async def get_stats():
             data=stats
         )
     except Exception as e:
+        logger.error(f"Error getting stats: {str(e)}", exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/upload/text")
@@ -84,6 +103,7 @@ async def upload_text_document(document: DocumentUpload):
             raise HTTPException(status_code=500, detail="Failed to store document")
             
     except Exception as e:
+        logger.error(f"Error processing text document: {str(e)}", exc_info=True)
         raise HTTPException(status_code=500, detail=f"Document processing failed: {str(e)}")
 
 @app.post("/upload/file")
@@ -125,6 +145,7 @@ async def upload_file_document(file: UploadFile = File(...)):
     except HTTPException:
         raise
     except Exception as e:
+        logger.error(f"Error processing file: {str(e)}", exc_info=True)
         raise HTTPException(status_code=500, detail=f"File processing failed: {str(e)}")
 
 @app.post("/query", response_model=QueryResponse)
@@ -143,6 +164,7 @@ async def query_documents(request: QueryRequest):
         )
         
     except Exception as e:
+        logger.error(f"Error processing query: {str(e)}", exc_info=True)
         raise HTTPException(status_code=500, detail=f"Query processing failed: {str(e)}")
 
 @app.delete("/clear")
@@ -160,6 +182,7 @@ async def clear_database():
             message="Vector database cleared successfully"
         )
     except Exception as e:
+        logger.error(f"Error clearing database: {str(e)}", exc_info=True)
         raise HTTPException(status_code=500, detail=f"Failed to clear database: {str(e)}")
 
 if __name__ == "__main__":

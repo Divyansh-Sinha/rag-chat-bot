@@ -4,6 +4,7 @@ import pickle
 import os
 from typing import List, Dict, Any, Tuple
 from config import config
+from logging_config import logger
 
 class FAISSVectorStore:
     def __init__(self):
@@ -20,6 +21,7 @@ class FAISSVectorStore:
     
     def _create_index(self):
         """Create a new FAISS index"""
+        logger.info("Creating new FAISS index.")
         self.index = faiss.IndexFlatL2(self.dimension)
         self.documents = []
     
@@ -34,8 +36,9 @@ class FAISSVectorStore:
                 with open(os.path.join(self.index_path, "documents.pkl"), "wb") as f:
                     pickle.dump(self.documents, f)
                     
-                print(f"Index saved with {len(self.documents)} documents")
+                logger.info(f"Index saved with {len(self.documents)} documents")
         except Exception as e:
+            logger.error(f"Failed to save index: {str(e)}", exc_info=True)
             raise Exception(f"Failed to save index: {str(e)}")
     
     def _load_index(self):
@@ -46,21 +49,24 @@ class FAISSVectorStore:
         if os.path.exists(index_file) and os.path.exists(docs_file):
             try:
                 # Load FAISS index
+                logger.info("Loading existing index...")
                 self.index = faiss.read_index(index_file)
                 
                 # Load document metadata
                 with open(docs_file, "rb") as f:
                     self.documents = pickle.load(f)
                     
-                print(f"Loaded existing index with {len(self.documents)} documents")
+                logger.info(f"Loaded existing index with {len(self.documents)} documents")
             except Exception as e:
-                print(f"Failed to load existing index: {str(e)}")
+                logger.error(f"Failed to load existing index: {str(e)}", exc_info=True)
                 self._create_index()
         else:
+            logger.info("No existing index found. Creating a new one.")
             self._create_index()
     
     def add_documents(self, processed_data: Dict[str, Any]) -> bool:
         """Add processed document data to the vector store"""
+        logger.info(f"Adding {processed_data['total_chunks']} new chunks to the vector store.")
         try:
             embeddings = processed_data["embeddings"]
             chunks = processed_data["chunks"]
@@ -85,15 +91,19 @@ class FAISSVectorStore:
             # Save the updated index
             self._save_index()
             
+            logger.info("Documents added successfully.")
             return True
         except Exception as e:
+            logger.error(f"Failed to add documents: {str(e)}", exc_info=True)
             raise Exception(f"Failed to add documents: {str(e)}")
     
     def search(self, query_embedding: List[float], k: int = 5) -> List[Dict[str, Any]]:
         """Search for similar documents"""
         if self.index is None or len(self.documents) == 0:
+            logger.warning("Search attempted on an empty vector store.")
             return []
         
+        logger.info(f"Searching for {k} nearest neighbors.")
         try:
             # Convert query embedding to numpy array with proper shape
             query_vector = np.array([query_embedding], dtype=np.float32)
@@ -112,8 +122,10 @@ class FAISSVectorStore:
                     doc["similarity_score"] = float(distances[0][i])
                     results.append(doc)
             
+            logger.info(f"Found {len(results)} matching documents.")
             return results
         except Exception as e:
+            logger.error(f"Failed to search: {str(e)}", exc_info=True)
             raise Exception(f"Failed to search: {str(e)}")
     
     def get_stats(self) -> Dict[str, Any]:

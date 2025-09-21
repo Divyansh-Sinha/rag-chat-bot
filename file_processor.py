@@ -4,6 +4,7 @@ from PyPDF2 import PdfReader
 import pandas as pd
 from docx import Document
 import io
+from logging_config import logger
 
 def _get_extension(filename):
     """
@@ -39,23 +40,28 @@ class FileProcessor:
             'error': str (if any)
         }
         """
+        logger.info(f"Processing file: {filename}")
         try:
             # Get file extension
             file_ext = _get_extension(filename)
 
             
             if file_ext not in self.supported_formats:
+                error_msg = f"Unsupported file format: {file_ext}. Supported formats: {list(self.supported_formats.keys())}"
+                logger.error(error_msg)
                 return {
                     'content': '',
                     'metadata': {},
                     'success': False,
-                    'error': f"Unsupported file format: {file_ext}. Supported formats: {list(self.supported_formats.keys())}"
+                    'error': error_msg
                 }
             
             # Process file based on extension
             processor = self.supported_formats[file_ext]
+            logger.info(f"Using processor: {processor.__name__}")
             content = processor(file_content, filename)
             
+            logger.info(f"File processed successfully: {filename}")
             return {
                 'content': content,
                 'metadata': {
@@ -69,11 +75,13 @@ class FileProcessor:
             }
             
         except Exception as e:
+            error_msg = f"Error processing file {filename}: {str(e)}"
+            logger.error(error_msg, exc_info=True)
             return {
                 'content': '',
                 'metadata': {},
                 'success': False,
-                'error': f"Error processing file {filename}: {str(e)}"
+                'error': error_msg
             }
     
     def _process_txt(self, file_content: bytes, filename: str) -> str:
@@ -81,12 +89,14 @@ class FileProcessor:
         try:
             return file_content.decode('utf-8')
         except UnicodeDecodeError:
+            logger.warning(f"UTF-8 decoding failed for {filename}. Trying other encodings.")
             # Try different encodings
             for encoding in ['latin-1', 'cp1252', 'iso-8859-1']:
                 try:
                     return file_content.decode(encoding)
                 except UnicodeDecodeError:
                     continue
+            logger.error(f"Unable to decode text file with common encodings: {filename}")
             raise Exception("Unable to decode text file with common encodings")
     
     def _process_pdf(self, file_content: bytes, filename: str) -> str:
@@ -103,11 +113,13 @@ class FileProcessor:
                     text_content.append(page_text)
             
             if not text_content:
+                logger.warning(f"No text content found in PDF: {filename}")
                 raise Exception("No text content found in PDF")
             
             return "\n\n".join(text_content)
             
         except Exception as e:
+            logger.error(f"Error processing PDF {filename}: {str(e)}", exc_info=True)
             raise Exception(f"Error processing PDF: {str(e)}")
     
     def _process_excel(self, file_content: bytes, filename: str) -> str:
@@ -143,6 +155,7 @@ class FileProcessor:
             return "\n\n".join(text_content)
             
         except Exception as e:
+            logger.error(f"Error processing Excel file {filename}: {str(e)}", exc_info=True)
             raise Exception(f"Error processing Excel file: {str(e)}")
     
     def _process_docx(self, file_content: bytes, filename: str) -> str:
@@ -174,11 +187,13 @@ class FileProcessor:
                     text_content.extend(table_text)
             
             if not text_content:
+                logger.warning(f"No text content found in Word document: {filename}")
                 raise Exception("No text content found in Word document")
             
             return "\n\n".join(text_content)
             
         except Exception as e:
+            logger.error(f"Error processing Word document {filename}: {str(e)}", exc_info=True)
             raise Exception(f"Error processing Word document: {str(e)}")
     
     def get_supported_formats(self) -> List[str]:
