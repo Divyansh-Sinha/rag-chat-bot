@@ -15,3 +15,6 @@ env/
 .idea/
 # Ignore Jupyter Notebook checkpoints
 .ipynb_checkpoints/
+
+# Ignore api-key json file
+rag-chat-api-key.json
