@@ -1,17 +1,19 @@
-from fastapi import FastAPI, HTTPException, File, UploadFile, Request
+from fastapi import FastAPI, HTTPException, File, UploadFile, Request, Depends, Header
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.security import OAuth2PasswordBearer
 import uvicorn
-from typing import List
+from typing import List, Optional
 import json
 import time
 
 from logging_config import logger
 
-from models import DocumentUpload, QueryRequest, QueryResponse, APIResponse
+from models import DocumentUpload, QueryRequest, QueryResponse, APIResponse, UserCreate, UserLogin
 from embedding_service import embedding_service
 from vector_store import vector_store
 from query_service import rag_orchestrator
-from file_processor import file_processor  # Import the new file processor
+from file_processor import file_processor
+from firebase_admin_auth import verify_firebase_token, generate_api_key, validate_api_key, create_firebase_user, login_with_email_and_password
 
 # Initialize FastAPI app
 app = FastAPI(
@@ -28,6 +30,23 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+from fastapi.security import HTTPBearer, APIKeyHeader
+
+# Security schemes
+http_bearer_scheme = HTTPBearer()
+api_key_scheme = APIKeyHeader(name='X-API-Key')
+
+async def get_current_user(token: str = Depends(http_bearer_scheme)) -> str:
+    user_id = verify_firebase_token(token.credentials)
+    if not user_id:
+        raise HTTPException(status_code=401, detail="Invalid or expired token")
+    return user_id
+
+async def api_key_header(x_api_key: str = Depends(api_key_scheme)):
+    if not validate_api_key(x_api_key):
+        raise HTTPException(status_code=401, detail="Invalid or expired API Key")
+    return x_api_key
 
 @app.middleware("http")
 async def log_requests(request: Request, call_next):
@@ -49,6 +68,35 @@ async def root():
     """Health check endpoint"""
     return {"message": "RAG API is running", "status": "healthy"}
 
+@app.post("/register")
+async def register_user(user_data: UserCreate):
+    """
+    Register a new user.
+    """
+    user_id = create_firebase_user(user_data.email, user_data.password)
+    if not user_id:
+        raise HTTPException(status_code=400, detail="Could not create user. The email might already be in use.")
+    
+    return APIResponse(success=True, message="User created successfully.")
+
+@app.post("/login")
+async def login_for_id_token(user_data: UserLogin):
+    """
+    Login a user and return an ID token.
+    """
+    user_id, id_token = login_with_email_and_password(user_data.email, user_data.password)
+    if not user_id:
+        raise HTTPException(status_code=401, detail="Invalid email or password")
+    
+    return APIResponse(success=True, message="Login successful", data={"id_token": id_token})
+
+
+@app.post("/generate-key")
+async def generate_new_api_key(user_id: str = Depends(get_current_user)):
+    """Generate a new API key for the authenticated user."""
+    api_key = generate_api_key(user_id)
+    return APIResponse(success=True, message="API Key generated successfully", data={"api_key": api_key})
+
 @app.get("/supported-formats")
 async def get_supported_formats():
     """Get list of supported file formats"""
@@ -64,7 +112,7 @@ async def get_supported_formats():
         }
     }
 
-@app.get("/stats")
+@app.get("/stats", dependencies=[Depends(api_key_header)])
 async def get_stats():
     """Get vector database statistics"""
     try:
@@ -78,7 +126,7 @@ async def get_stats():
         logger.error(f"Error getting stats: {str(e)}", exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.post("/upload/text")
+@app.post("/upload/text", dependencies=[Depends(api_key_header)])
 async def upload_text_document(document: DocumentUpload):
     """
     Upload and process text document for embedding and storage
@@ -106,7 +154,7 @@ async def upload_text_document(document: DocumentUpload):
         logger.error(f"Error processing text document: {str(e)}", exc_info=True)
         raise HTTPException(status_code=500, detail=f"Document processing failed: {str(e)}")
 
-@app.post("/upload/file")
+@app.post("/upload/file", dependencies=[Depends(api_key_header)])
 async def upload_file_document(file: UploadFile = File(...)):
     """Upload and process various file formats (PDF, Excel, Word, Text)"""
     try:
@@ -148,7 +196,7 @@ async def upload_file_document(file: UploadFile = File(...)):
         logger.error(f"Error processing file: {str(e)}", exc_info=True)
         raise HTTPException(status_code=500, detail=f"File processing failed: {str(e)}")
 
-@app.post("/query", response_model=QueryResponse)
+@app.post("/query", response_model=QueryResponse, dependencies=[Depends(api_key_header)])
 async def query_documents(request: QueryRequest):
     """
     Query the knowledge base and get AI-generated response
@@ -167,7 +215,7 @@ async def query_documents(request: QueryRequest):
         logger.error(f"Error processing query: {str(e)}", exc_info=True)
         raise HTTPException(status_code=500, detail=f"Query processing failed: {str(e)}")
 
-@app.delete("/clear")
+@app.delete("/clear", dependencies=[Depends(api_key_header)])
 async def clear_database():
     """
     Clear all documents from the vector database
