@@ -102,3 +102,347 @@ Traceback (most recent call last):
   File "D:\Repositories\GEN AI\rag\venv\Lib\site-packages\requests\models.py", line 1026, in raise_for_status
     raise HTTPError(http_error_msg, response=self)
 requests.exceptions.HTTPError: 400 Client Error: Bad Request for url: https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyAUA01g7RrFEdz9tpFpmEiEVB0UV5RP1_w
+2025-09-24 01:41:18,882 - ERROR - root - firebase_admin_auth - verify_firebase_token - 34 - Invalid Firebase token: Token expired, 1758658081 < 1758658278
+Traceback (most recent call last):
+  File "D:\rag\rag_chat_bot\rag-chat-bot\venv\Lib\site-packages\firebase_admin\_token_gen.py", line 396, in verify
+    verified_claims = google.oauth2.id_token.verify_token(
+        token,
+    ...<2 lines>...
+        certs_url=self.cert_url,
+        clock_skew_in_seconds=clock_skew_seconds)
+  File "D:\rag\rag_chat_bot\rag-chat-bot\venv\Lib\site-packages\google\oauth2\id_token.py", line 150, in verify_token
+    return jwt.decode(
+           ~~~~~~~~~~^
+        id_token,
+        ^^^^^^^^^
+    ...<2 lines>...
+        clock_skew_in_seconds=clock_skew_in_seconds,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "D:\rag\rag_chat_bot\rag-chat-bot\venv\Lib\site-packages\google\auth\jwt.py", line 302, in decode
+    _verify_iat_and_exp(payload, clock_skew_in_seconds)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\rag\rag_chat_bot\rag-chat-bot\venv\Lib\site-packages\google\auth\jwt.py", line 228, in _verify_iat_and_exp
+    raise exceptions.InvalidValue("Token expired, {} < {}".format(latest, now))
+google.auth.exceptions.InvalidValue: Token expired, 1758658081 < 1758658278
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\rag\rag_chat_bot\rag-chat-bot\firebase_admin_auth.py", line 31, in verify_firebase_token
+    decoded_token = auth.verify_id_token(token)
+  File "D:\rag\rag_chat_bot\rag-chat-bot\venv\Lib\site-packages\firebase_admin\auth.py", line 227, in verify_id_token
+    return client.verify_id_token(
+           ~~~~~~~~~~~~~~~~~~~~~~^
+        id_token, check_revoked=check_revoked, clock_skew_seconds=clock_skew_seconds)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\rag\rag_chat_bot\rag-chat-bot\venv\Lib\site-packages\firebase_admin\_auth_client.py", line 130, in verify_id_token
+    verified_claims = self._token_verifier.verify_id_token(id_token, clock_skew_seconds)
+  File "D:\rag\rag_chat_bot\rag-chat-bot\venv\Lib\site-packages\firebase_admin\_token_gen.py", line 293, in verify_id_token
+    return self.id_token_verifier.verify(id_token, self.request, clock_skew_seconds)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\rag\rag_chat_bot\rag-chat-bot\venv\Lib\site-packages\firebase_admin\_token_gen.py", line 408, in verify
+    raise self._expired_token_error(str(error), cause=error)
+firebase_admin._token_gen.ExpiredIdTokenError: Token expired, 1758658081 < 1758658278
+2025-09-24 01:41:41,366 - ERROR - root - firebase_admin_auth - verify_firebase_token - 34 - Invalid Firebase token: Token expired, 1758658081 < 1758658301
+Traceback (most recent call last):
+  File "D:\rag\rag_chat_bot\rag-chat-bot\venv\Lib\site-packages\firebase_admin\_token_gen.py", line 396, in verify
+    verified_claims = google.oauth2.id_token.verify_token(
+        token,
+    ...<2 lines>...
+        certs_url=self.cert_url,
+        clock_skew_in_seconds=clock_skew_seconds)
+  File "D:\rag\rag_chat_bot\rag-chat-bot\venv\Lib\site-packages\google\oauth2\id_token.py", line 150, in verify_token
+    return jwt.decode(
+           ~~~~~~~~~~^
+        id_token,
+        ^^^^^^^^^
+    ...<2 lines>...
+        clock_skew_in_seconds=clock_skew_in_seconds,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "D:\rag\rag_chat_bot\rag-chat-bot\venv\Lib\site-packages\google\auth\jwt.py", line 302, in decode
+    _verify_iat_and_exp(payload, clock_skew_in_seconds)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\rag\rag_chat_bot\rag-chat-bot\venv\Lib\site-packages\google\auth\jwt.py", line 228, in _verify_iat_and_exp
+    raise exceptions.InvalidValue("Token expired, {} < {}".format(latest, now))
+google.auth.exceptions.InvalidValue: Token expired, 1758658081 < 1758658301
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\rag\rag_chat_bot\rag-chat-bot\firebase_admin_auth.py", line 31, in verify_firebase_token
+    decoded_token = auth.verify_id_token(token)
+  File "D:\rag\rag_chat_bot\rag-chat-bot\venv\Lib\site-packages\firebase_admin\auth.py", line 227, in verify_id_token
+    return client.verify_id_token(
+           ~~~~~~~~~~~~~~~~~~~~~~^
+        id_token, check_revoked=check_revoked, clock_skew_seconds=clock_skew_seconds)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\rag\rag_chat_bot\rag-chat-bot\venv\Lib\site-packages\firebase_admin\_auth_client.py", line 130, in verify_id_token
+    verified_claims = self._token_verifier.verify_id_token(id_token, clock_skew_seconds)
+  File "D:\rag\rag_chat_bot\rag-chat-bot\venv\Lib\site-packages\firebase_admin\_token_gen.py", line 293, in verify_id_token
+    return self.id_token_verifier.verify(id_token, self.request, clock_skew_seconds)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\rag\rag_chat_bot\rag-chat-bot\venv\Lib\site-packages\firebase_admin\_token_gen.py", line 408, in verify
+    raise self._expired_token_error(str(error), cause=error)
+firebase_admin._token_gen.ExpiredIdTokenError: Token expired, 1758658081 < 1758658301
+2025-09-24 01:41:43,984 - ERROR - root - firebase_admin_auth - verify_firebase_token - 34 - Invalid Firebase token: Token expired, 1758658081 < 1758658303
+Traceback (most recent call last):
+  File "D:\rag\rag_chat_bot\rag-chat-bot\venv\Lib\site-packages\firebase_admin\_token_gen.py", line 396, in verify
+    verified_claims = google.oauth2.id_token.verify_token(
+        token,
+    ...<2 lines>...
+        certs_url=self.cert_url,
+        clock_skew_in_seconds=clock_skew_seconds)
+  File "D:\rag\rag_chat_bot\rag-chat-bot\venv\Lib\site-packages\google\oauth2\id_token.py", line 150, in verify_token
+    return jwt.decode(
+           ~~~~~~~~~~^
+        id_token,
+        ^^^^^^^^^
+    ...<2 lines>...
+        clock_skew_in_seconds=clock_skew_in_seconds,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "D:\rag\rag_chat_bot\rag-chat-bot\venv\Lib\site-packages\google\auth\jwt.py", line 302, in decode
+    _verify_iat_and_exp(payload, clock_skew_in_seconds)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\rag\rag_chat_bot\rag-chat-bot\venv\Lib\site-packages\google\auth\jwt.py", line 228, in _verify_iat_and_exp
+    raise exceptions.InvalidValue("Token expired, {} < {}".format(latest, now))
+google.auth.exceptions.InvalidValue: Token expired, 1758658081 < 1758658303
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\rag\rag_chat_bot\rag-chat-bot\firebase_admin_auth.py", line 31, in verify_firebase_token
+    decoded_token = auth.verify_id_token(token)
+  File "D:\rag\rag_chat_bot\rag-chat-bot\venv\Lib\site-packages\firebase_admin\auth.py", line 227, in verify_id_token
+    return client.verify_id_token(
+           ~~~~~~~~~~~~~~~~~~~~~~^
+        id_token, check_revoked=check_revoked, clock_skew_seconds=clock_skew_seconds)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\rag\rag_chat_bot\rag-chat-bot\venv\Lib\site-packages\firebase_admin\_auth_client.py", line 130, in verify_id_token
+    verified_claims = self._token_verifier.verify_id_token(id_token, clock_skew_seconds)
+  File "D:\rag\rag_chat_bot\rag-chat-bot\venv\Lib\site-packages\firebase_admin\_token_gen.py", line 293, in verify_id_token
+    return self.id_token_verifier.verify(id_token, self.request, clock_skew_seconds)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\rag\rag_chat_bot\rag-chat-bot\venv\Lib\site-packages\firebase_admin\_token_gen.py", line 408, in verify
+    raise self._expired_token_error(str(error), cause=error)
+firebase_admin._token_gen.ExpiredIdTokenError: Token expired, 1758658081 < 1758658303
+2025-09-24 01:41:44,207 - ERROR - root - firebase_admin_auth - verify_firebase_token - 34 - Invalid Firebase token: Token expired, 1758658081 < 1758658304
+Traceback (most recent call last):
+  File "D:\rag\rag_chat_bot\rag-chat-bot\venv\Lib\site-packages\firebase_admin\_token_gen.py", line 396, in verify
+    verified_claims = google.oauth2.id_token.verify_token(
+        token,
+    ...<2 lines>...
+        certs_url=self.cert_url,
+        clock_skew_in_seconds=clock_skew_seconds)
+  File "D:\rag\rag_chat_bot\rag-chat-bot\venv\Lib\site-packages\google\oauth2\id_token.py", line 150, in verify_token
+    return jwt.decode(
+           ~~~~~~~~~~^
+        id_token,
+        ^^^^^^^^^
+    ...<2 lines>...
+        clock_skew_in_seconds=clock_skew_in_seconds,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "D:\rag\rag_chat_bot\rag-chat-bot\venv\Lib\site-packages\google\auth\jwt.py", line 302, in decode
+    _verify_iat_and_exp(payload, clock_skew_in_seconds)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\rag\rag_chat_bot\rag-chat-bot\venv\Lib\site-packages\google\auth\jwt.py", line 228, in _verify_iat_and_exp
+    raise exceptions.InvalidValue("Token expired, {} < {}".format(latest, now))
+google.auth.exceptions.InvalidValue: Token expired, 1758658081 < 1758658304
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\rag\rag_chat_bot\rag-chat-bot\firebase_admin_auth.py", line 31, in verify_firebase_token
+    decoded_token = auth.verify_id_token(token)
+  File "D:\rag\rag_chat_bot\rag-chat-bot\venv\Lib\site-packages\firebase_admin\auth.py", line 227, in verify_id_token
+    return client.verify_id_token(
+           ~~~~~~~~~~~~~~~~~~~~~~^
+        id_token, check_revoked=check_revoked, clock_skew_seconds=clock_skew_seconds)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\rag\rag_chat_bot\rag-chat-bot\venv\Lib\site-packages\firebase_admin\_auth_client.py", line 130, in verify_id_token
+    verified_claims = self._token_verifier.verify_id_token(id_token, clock_skew_seconds)
+  File "D:\rag\rag_chat_bot\rag-chat-bot\venv\Lib\site-packages\firebase_admin\_token_gen.py", line 293, in verify_id_token
+    return self.id_token_verifier.verify(id_token, self.request, clock_skew_seconds)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\rag\rag_chat_bot\rag-chat-bot\venv\Lib\site-packages\firebase_admin\_token_gen.py", line 408, in verify
+    raise self._expired_token_error(str(error), cause=error)
+firebase_admin._token_gen.ExpiredIdTokenError: Token expired, 1758658081 < 1758658304
+2025-09-24 01:41:49,049 - ERROR - root - firebase_admin_auth - verify_firebase_token - 34 - Invalid Firebase token: Token expired, 1758658081 < 1758658309
+Traceback (most recent call last):
+  File "D:\rag\rag_chat_bot\rag-chat-bot\venv\Lib\site-packages\firebase_admin\_token_gen.py", line 396, in verify
+    verified_claims = google.oauth2.id_token.verify_token(
+        token,
+    ...<2 lines>...
+        certs_url=self.cert_url,
+        clock_skew_in_seconds=clock_skew_seconds)
+  File "D:\rag\rag_chat_bot\rag-chat-bot\venv\Lib\site-packages\google\oauth2\id_token.py", line 150, in verify_token
+    return jwt.decode(
+           ~~~~~~~~~~^
+        id_token,
+        ^^^^^^^^^
+    ...<2 lines>...
+        clock_skew_in_seconds=clock_skew_in_seconds,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "D:\rag\rag_chat_bot\rag-chat-bot\venv\Lib\site-packages\google\auth\jwt.py", line 302, in decode
+    _verify_iat_and_exp(payload, clock_skew_in_seconds)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\rag\rag_chat_bot\rag-chat-bot\venv\Lib\site-packages\google\auth\jwt.py", line 228, in _verify_iat_and_exp
+    raise exceptions.InvalidValue("Token expired, {} < {}".format(latest, now))
+google.auth.exceptions.InvalidValue: Token expired, 1758658081 < 1758658309
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\rag\rag_chat_bot\rag-chat-bot\firebase_admin_auth.py", line 31, in verify_firebase_token
+    decoded_token = auth.verify_id_token(token)
+  File "D:\rag\rag_chat_bot\rag-chat-bot\venv\Lib\site-packages\firebase_admin\auth.py", line 227, in verify_id_token
+    return client.verify_id_token(
+           ~~~~~~~~~~~~~~~~~~~~~~^
+        id_token, check_revoked=check_revoked, clock_skew_seconds=clock_skew_seconds)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\rag\rag_chat_bot\rag-chat-bot\venv\Lib\site-packages\firebase_admin\_auth_client.py", line 130, in verify_id_token
+    verified_claims = self._token_verifier.verify_id_token(id_token, clock_skew_seconds)
+  File "D:\rag\rag_chat_bot\rag-chat-bot\venv\Lib\site-packages\firebase_admin\_token_gen.py", line 293, in verify_id_token
+    return self.id_token_verifier.verify(id_token, self.request, clock_skew_seconds)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\rag\rag_chat_bot\rag-chat-bot\venv\Lib\site-packages\firebase_admin\_token_gen.py", line 408, in verify
+    raise self._expired_token_error(str(error), cause=error)
+firebase_admin._token_gen.ExpiredIdTokenError: Token expired, 1758658081 < 1758658309
+2025-09-24 01:41:49,102 - ERROR - root - firebase_admin_auth - verify_firebase_token - 34 - Invalid Firebase token: Token expired, 1758658081 < 1758658309
+Traceback (most recent call last):
+  File "D:\rag\rag_chat_bot\rag-chat-bot\venv\Lib\site-packages\firebase_admin\_token_gen.py", line 396, in verify
+    verified_claims = google.oauth2.id_token.verify_token(
+        token,
+    ...<2 lines>...
+        certs_url=self.cert_url,
+        clock_skew_in_seconds=clock_skew_seconds)
+  File "D:\rag\rag_chat_bot\rag-chat-bot\venv\Lib\site-packages\google\oauth2\id_token.py", line 150, in verify_token
+    return jwt.decode(
+           ~~~~~~~~~~^
+        id_token,
+        ^^^^^^^^^
+    ...<2 lines>...
+        clock_skew_in_seconds=clock_skew_in_seconds,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "D:\rag\rag_chat_bot\rag-chat-bot\venv\Lib\site-packages\google\auth\jwt.py", line 302, in decode
+    _verify_iat_and_exp(payload, clock_skew_in_seconds)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\rag\rag_chat_bot\rag-chat-bot\venv\Lib\site-packages\google\auth\jwt.py", line 228, in _verify_iat_and_exp
+    raise exceptions.InvalidValue("Token expired, {} < {}".format(latest, now))
+google.auth.exceptions.InvalidValue: Token expired, 1758658081 < 1758658309
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\rag\rag_chat_bot\rag-chat-bot\firebase_admin_auth.py", line 31, in verify_firebase_token
+    decoded_token = auth.verify_id_token(token)
+  File "D:\rag\rag_chat_bot\rag-chat-bot\venv\Lib\site-packages\firebase_admin\auth.py", line 227, in verify_id_token
+    return client.verify_id_token(
+           ~~~~~~~~~~~~~~~~~~~~~~^
+        id_token, check_revoked=check_revoked, clock_skew_seconds=clock_skew_seconds)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\rag\rag_chat_bot\rag-chat-bot\venv\Lib\site-packages\firebase_admin\_auth_client.py", line 130, in verify_id_token
+    verified_claims = self._token_verifier.verify_id_token(id_token, clock_skew_seconds)
+  File "D:\rag\rag_chat_bot\rag-chat-bot\venv\Lib\site-packages\firebase_admin\_token_gen.py", line 293, in verify_id_token
+    return self.id_token_verifier.verify(id_token, self.request, clock_skew_seconds)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\rag\rag_chat_bot\rag-chat-bot\venv\Lib\site-packages\firebase_admin\_token_gen.py", line 408, in verify
+    raise self._expired_token_error(str(error), cause=error)
+firebase_admin._token_gen.ExpiredIdTokenError: Token expired, 1758658081 < 1758658309
+2025-09-24 01:41:51,683 - ERROR - root - firebase_admin_auth - verify_firebase_token - 34 - Invalid Firebase token: Token expired, 1758658081 < 1758658311
+Traceback (most recent call last):
+  File "D:\rag\rag_chat_bot\rag-chat-bot\venv\Lib\site-packages\firebase_admin\_token_gen.py", line 396, in verify
+    verified_claims = google.oauth2.id_token.verify_token(
+        token,
+    ...<2 lines>...
+        certs_url=self.cert_url,
+        clock_skew_in_seconds=clock_skew_seconds)
+  File "D:\rag\rag_chat_bot\rag-chat-bot\venv\Lib\site-packages\google\oauth2\id_token.py", line 150, in verify_token
+    return jwt.decode(
+           ~~~~~~~~~~^
+        id_token,
+        ^^^^^^^^^
+    ...<2 lines>...
+        clock_skew_in_seconds=clock_skew_in_seconds,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "D:\rag\rag_chat_bot\rag-chat-bot\venv\Lib\site-packages\google\auth\jwt.py", line 302, in decode
+    _verify_iat_and_exp(payload, clock_skew_in_seconds)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\rag\rag_chat_bot\rag-chat-bot\venv\Lib\site-packages\google\auth\jwt.py", line 228, in _verify_iat_and_exp
+    raise exceptions.InvalidValue("Token expired, {} < {}".format(latest, now))
+google.auth.exceptions.InvalidValue: Token expired, 1758658081 < 1758658311
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\rag\rag_chat_bot\rag-chat-bot\firebase_admin_auth.py", line 31, in verify_firebase_token
+    decoded_token = auth.verify_id_token(token)
+  File "D:\rag\rag_chat_bot\rag-chat-bot\venv\Lib\site-packages\firebase_admin\auth.py", line 227, in verify_id_token
+    return client.verify_id_token(
+           ~~~~~~~~~~~~~~~~~~~~~~^
+        id_token, check_revoked=check_revoked, clock_skew_seconds=clock_skew_seconds)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\rag\rag_chat_bot\rag-chat-bot\venv\Lib\site-packages\firebase_admin\_auth_client.py", line 130, in verify_id_token
+    verified_claims = self._token_verifier.verify_id_token(id_token, clock_skew_seconds)
+  File "D:\rag\rag_chat_bot\rag-chat-bot\venv\Lib\site-packages\firebase_admin\_token_gen.py", line 293, in verify_id_token
+    return self.id_token_verifier.verify(id_token, self.request, clock_skew_seconds)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\rag\rag_chat_bot\rag-chat-bot\venv\Lib\site-packages\firebase_admin\_token_gen.py", line 408, in verify
+    raise self._expired_token_error(str(error), cause=error)
+firebase_admin._token_gen.ExpiredIdTokenError: Token expired, 1758658081 < 1758658311
+2025-09-24 01:41:59,422 - ERROR - root - firebase_admin_auth - verify_firebase_token - 34 - Invalid Firebase token: Token expired, 1758658081 < 1758658319
+Traceback (most recent call last):
+  File "D:\rag\rag_chat_bot\rag-chat-bot\venv\Lib\site-packages\firebase_admin\_token_gen.py", line 396, in verify
+    verified_claims = google.oauth2.id_token.verify_token(
+        token,
+    ...<2 lines>...
+        certs_url=self.cert_url,
+        clock_skew_in_seconds=clock_skew_seconds)
+  File "D:\rag\rag_chat_bot\rag-chat-bot\venv\Lib\site-packages\google\oauth2\id_token.py", line 150, in verify_token
+    return jwt.decode(
+           ~~~~~~~~~~^
+        id_token,
+        ^^^^^^^^^
+    ...<2 lines>...
+        clock_skew_in_seconds=clock_skew_in_seconds,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "D:\rag\rag_chat_bot\rag-chat-bot\venv\Lib\site-packages\google\auth\jwt.py", line 302, in decode
+    _verify_iat_and_exp(payload, clock_skew_in_seconds)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\rag\rag_chat_bot\rag-chat-bot\venv\Lib\site-packages\google\auth\jwt.py", line 228, in _verify_iat_and_exp
+    raise exceptions.InvalidValue("Token expired, {} < {}".format(latest, now))
+google.auth.exceptions.InvalidValue: Token expired, 1758658081 < 1758658319
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\rag\rag_chat_bot\rag-chat-bot\firebase_admin_auth.py", line 31, in verify_firebase_token
+    decoded_token = auth.verify_id_token(token)
+  File "D:\rag\rag_chat_bot\rag-chat-bot\venv\Lib\site-packages\firebase_admin\auth.py", line 227, in verify_id_token
+    return client.verify_id_token(
+           ~~~~~~~~~~~~~~~~~~~~~~^
+        id_token, check_revoked=check_revoked, clock_skew_seconds=clock_skew_seconds)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\rag\rag_chat_bot\rag-chat-bot\venv\Lib\site-packages\firebase_admin\_auth_client.py", line 130, in verify_id_token
+    verified_claims = self._token_verifier.verify_id_token(id_token, clock_skew_seconds)
+  File "D:\rag\rag_chat_bot\rag-chat-bot\venv\Lib\site-packages\firebase_admin\_token_gen.py", line 293, in verify_id_token
+    return self.id_token_verifier.verify(id_token, self.request, clock_skew_seconds)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\rag\rag_chat_bot\rag-chat-bot\venv\Lib\site-packages\firebase_admin\_token_gen.py", line 408, in verify
+    raise self._expired_token_error(str(error), cause=error)
+firebase_admin._token_gen.ExpiredIdTokenError: Token expired, 1758658081 < 1758658319
