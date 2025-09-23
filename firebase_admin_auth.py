@@ -36,7 +36,7 @@ def verify_firebase_token(token: str):
 
 from datetime import timezone
 
-def generate_api_key(user_id: str) -> str:
+def generate_api_key(user_id: str, name: str = None) -> str:
     """
     Generate a new API key for a user and store it in Firestore.
     """
@@ -45,13 +45,14 @@ def generate_api_key(user_id: str) -> str:
     key_data = {
         'user_id': user_id,
         'api_key': api_key,
+        'name': name,
         'created_at': datetime.datetime.now(timezone.utc),
         'active': True,
         'usage_count': 0,
         'expires_at': datetime.datetime.now(timezone.utc) + datetime.timedelta(days=365) # Key expires in 1 year
     }
     db.collection('api_keys').document(api_key).set(key_data)
-    logger.info(f"Generated API key for user {user_id}")
+    logger.info(f"Generated API key for user {user_id}" + (f" with name '{name}'" if name else ""))
     return api_key
 
 def validate_api_key(api_key: str):
@@ -74,6 +75,32 @@ def validate_api_key(api_key: str):
     key_ref.update({'usage_count': firestore.Increment(1)})
     
     return key_data
+
+def get_user_api_keys(user_id: str) -> list:
+    """
+    Retrieve all API keys for a specific user from Firestore.
+    """
+    try:
+        db = firestore.client()
+        # Query for all API keys belonging to the user
+        keys_query = db.collection('api_keys').where('user_id', '==', user_id)
+        keys_docs = keys_query.stream()
+        
+        # Extract key data, excluding the actual API key value for security
+        user_keys = []
+        for doc in keys_docs:
+            key_data = doc.to_dict()
+            # Remove the actual API key value for security
+            key_data.pop('api_key', None)
+            # Add document ID
+            key_data['id'] = doc.id
+            user_keys.append(key_data)
+        
+        logger.info(f"Retrieved {len(user_keys)} API keys for user {user_id}")
+        return user_keys
+    except Exception as e:
+        logger.error(f"Failed to retrieve API keys for user {user_id}: {str(e)}", exc_info=True)
+        raise Exception(f"Failed to retrieve API keys: {str(e)}")
 
 def create_firebase_user(email, password):
     """

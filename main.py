@@ -92,10 +92,25 @@ async def login_for_id_token(user_data: UserLogin):
 
 
 @app.post("/generate-key")
-async def generate_new_api_key(user_id: str = Depends(get_current_user)):
+async def generate_new_api_key(user_id: str = Depends(get_current_user), name: Optional[str] = None):
     """Generate a new API key for the authenticated user."""
-    api_key = generate_api_key(user_id)
-    return APIResponse(success=True, message="API Key generated successfully", data={"api_key": api_key})
+    api_key = generate_api_key(user_id, name)
+    return APIResponse(success=True, message="API Key generated successfully", data={"api_key": api_key, "name": name})
+
+@app.get("/api-keys")
+async def get_user_api_keys_endpoint(user_id: str = Depends(get_current_user)):
+    """Retrieve all API keys for the authenticated user."""
+    from firebase_admin_auth import get_user_api_keys
+    try:
+        user_keys = get_user_api_keys(user_id)
+        return APIResponse(
+            success=True, 
+            message="API keys retrieved successfully", 
+            data={"api_keys": user_keys}
+        )
+    except Exception as e:
+        logger.error(f"Error retrieving API keys: {str(e)}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Failed to retrieve API keys: {str(e)}")
 
 @app.get("/supported-formats")
 async def get_supported_formats():
