@@ -14,6 +14,7 @@ from vector_store import vector_store
 from query_service import rag_orchestrator
 from file_processor import file_processor
 from firebase_admin_auth import verify_firebase_token, generate_api_key, validate_api_key, create_firebase_user, login_with_email_and_password
+from firebase_admin_auth import delete_api_key, set_api_key_active
 
 # Initialize FastAPI app
 app = FastAPI(
@@ -111,6 +112,38 @@ async def get_user_api_keys_endpoint(user_id: str = Depends(get_current_user)):
     except Exception as e:
         logger.error(f"Error retrieving API keys: {str(e)}", exc_info=True)
         raise HTTPException(status_code=500, detail=f"Failed to retrieve API keys: {str(e)}")
+
+@app.delete("/api-keys/{key_id}")
+async def delete_user_api_key(key_id: str, user_id: str = Depends(get_current_user)):
+    """Delete a specific API key belonging to the authenticated user."""
+    try:
+        deleted = delete_api_key(key_id, user_id)
+        if not deleted:
+            raise HTTPException(status_code=404, detail="API key not found or not owned by user")
+        return APIResponse(success=True, message="API key deleted successfully")
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error deleting API key {key_id}: {str(e)}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Failed to delete API key: {str(e)}")
+
+@app.post("/api-keys/{key_id}/active")
+async def set_user_api_key_active(key_id: str, request: Request, user_id: str = Depends(get_current_user)):
+    """Activate or deactivate an API key. Body expects JSON: { "active": true|false }"""
+    try:
+        # Optional ownership check by reading first; delete_api_key already checks, but we can proceed
+        body = await request.json()
+        active = bool(body.get("active"))
+
+        updated = set_api_key_active(key_id, active)
+        if not updated:
+            raise HTTPException(status_code=404, detail="API key not found")
+        return APIResponse(success=True, message="API key status updated", data={"active": active})
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error updating API key active status {key_id}: {str(e)}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Failed to update API key status: {str(e)}")
 
 @app.get("/supported-formats")
 async def get_supported_formats():

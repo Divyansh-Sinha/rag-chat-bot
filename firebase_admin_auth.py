@@ -139,3 +139,58 @@ def login_with_email_and_password(email, password):
     except Exception as e:
         logger.error(f"An unexpected error occurred during login: {str(e)}", exc_info=True)
         return None, None
+
+def delete_api_key(api_key: str, user_id: str = None) -> bool:
+    """
+    Delete an API key document from Firestore.
+    Optionally ensure it belongs to the provided user_id.
+    Returns True if deleted, False if not found or not permitted.
+    """
+    try:
+        db = firestore.client()
+        key_ref = db.collection('api_keys').document(api_key)
+        key_doc = key_ref.get()
+
+        if not key_doc.exists:
+            logger.warning(f"Attempted to delete non-existent API key: {api_key}")
+            return False
+
+        key_data = key_doc.to_dict()
+        if user_id is not None and key_data.get('user_id') != user_id:
+            logger.warning(
+                f"User {user_id} attempted to delete API key not owned by them: {api_key}"
+            )
+            return False
+
+        key_ref.delete()
+        logger.info(
+            f"Deleted API key {api_key}" + (f" for user {user_id}" if user_id else "")
+        )
+        return True
+    except Exception as e:
+        logger.error(f"Failed to delete API key {api_key}: {str(e)}", exc_info=True)
+        return False
+
+def set_api_key_active(api_key: str, active: bool) -> bool:
+    """
+    Set the 'active' status of an API key document.
+    Returns True if updated, False otherwise.
+    """
+    try:
+        db = firestore.client()
+        key_ref = db.collection('api_keys').document(api_key)
+        key_doc = key_ref.get()
+
+        if not key_doc.exists:
+            logger.warning(f"Attempted to update non-existent API key: {api_key}")
+            return False
+
+        key_ref.update({'active': active})
+        logger.info(f"Set API key {api_key} active={active}")
+        return True
+    except Exception as e:
+        logger.error(
+            f"Failed to update active status for API key {api_key}: {str(e)}",
+            exc_info=True,
+        )
+        return False
