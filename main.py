@@ -44,10 +44,14 @@ async def get_current_user(token: str = Depends(http_bearer_scheme)) -> str:
         raise HTTPException(status_code=401, detail="Invalid or expired token")
     return user_id
 
-async def api_key_header(x_api_key: str = Depends(api_key_scheme)):
-    if not validate_api_key(x_api_key):
+async def get_current_user_id_from_api_key(x_api_key: str = Depends(api_key_scheme)) -> str:
+    key_data = validate_api_key(x_api_key)
+    if not key_data:
         raise HTTPException(status_code=401, detail="Invalid or expired API Key")
-    return x_api_key
+    user_id = key_data.get('user_id')
+    if not user_id:
+        raise HTTPException(status_code=401, detail="API Key is not associated with a user")
+    return user_id
 
 @app.middleware("http")
 async def log_requests(request: Request, call_next):
@@ -160,24 +164,24 @@ async def get_supported_formats():
         }
     }
 
-@app.get("/stats", dependencies=[Depends(api_key_header)])
-async def get_stats():
-    """Get vector database statistics"""
+@app.get("/stats")
+async def get_stats(user_id: str = Depends(get_current_user_id_from_api_key)):
+    """Get vector database statistics for the current user."""
     try:
-        stats = vector_store.get_stats()
+        stats = vector_store.get_stats(user_id)
         return APIResponse(
             success=True,
             message="Statistics retrieved successfully",
             data=stats
         )
     except Exception as e:
-        logger.error(f"Error getting stats: {str(e)}", exc_info=True)
+        logger.error(f"Error getting stats for user {user_id}: {str(e)}", exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.post("/upload/text", dependencies=[Depends(api_key_header)])
-async def upload_text_document(document: DocumentUpload):
+@app.post("/upload/text")
+async def upload_text_document(document: DocumentUpload, user_id: str = Depends(get_current_user_id_from_api_key)):
     """
-    Upload and process text document for embedding and storage
+    Upload and process text document for embedding and storage for the current user.
     """
     try:
         # Process the document
@@ -186,8 +190,8 @@ async def upload_text_document(document: DocumentUpload):
             metadata=document.metadata
         )
         
-        # Add to vector store
-        success = vector_store.add_documents(processed_data)
+        # Add to vector store for the specific user
+        success = vector_store.add_documents(user_id, processed_data)
         
         if success:
             return APIResponse(
@@ -199,12 +203,12 @@ async def upload_text_document(document: DocumentUpload):
             raise HTTPException(status_code=500, detail="Failed to store document")
             
     except Exception as e:
-        logger.error(f"Error processing text document: {str(e)}", exc_info=True)
+        logger.error(f"Error processing text document for user {user_id}: {str(e)}", exc_info=True)
         raise HTTPException(status_code=500, detail=f"Document processing failed: {str(e)}")
 
-@app.post("/upload/file", dependencies=[Depends(api_key_header)])
-async def upload_file_document(file: UploadFile = File(...)):
-    """Upload and process various file formats (PDF, Excel, Word, Text)"""
+@app.post("/upload/file")
+async def upload_file_document(user_id: str = Depends(get_current_user_id_from_api_key), file: UploadFile = File(...)):
+    """Upload and process various file formats for the current user."""
     try:
         # Read file content
         file_content = await file.read()
@@ -221,8 +225,8 @@ async def upload_file_document(file: UploadFile = File(...)):
             metadata=processing_result['metadata']
         )
         
-        # Add to vector store
-        success = vector_store.add_documents(processed_data)
+        # Add to vector store for the specific user
+        success = vector_store.add_documents(user_id, processed_data)
         
         if success:
             return APIResponse(
@@ -241,17 +245,17 @@ async def upload_file_document(file: UploadFile = File(...)):
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"Error processing file: {str(e)}", exc_info=True)
+        logger.error(f"Error processing file for user {user_id}: {str(e)}", exc_info=True)
         raise HTTPException(status_code=500, detail=f"File processing failed: {str(e)}")
 
-@app.post("/query", response_model=QueryResponse, dependencies=[Depends(api_key_header)])
-async def query_documents(request: QueryRequest):
+@app.post("/query", response_model=QueryResponse)
+async def query_documents(request: QueryRequest, user_id: str = Depends(get_current_user_id_from_api_key)):
     """
-    Query the knowledge base and get AI-generated response
+    Query the knowledge base for the current user and get AI-generated response.
     """
     try:
-        # Process query through RAG pipeline
-        result = rag_orchestrator.process_query(request.query)
+        # Process query through RAG pipeline for the specific user
+        result = rag_orchestrator.process_query(request.query, user_id)
         
         return QueryResponse(
             answer=result["answer"],
@@ -260,25 +264,23 @@ async def query_documents(request: QueryRequest):
         )
         
     except Exception as e:
-        logger.error(f"Error processing query: {str(e)}", exc_info=True)
+        logger.error(f"Error processing query for user {user_id}: {str(e)}", exc_info=True)
         raise HTTPException(status_code=500, detail=f"Query processing failed: {str(e)}")
 
-@app.delete("/clear", dependencies=[Depends(api_key_header)])
-async def clear_database():
+@app.delete("/clear")
+async def clear_database(user_id: str = Depends(get_current_user_id_from_api_key)):
     """
-    Clear all documents from the vector database
+    Clear all documents from the vector database for the current user.
     """
     try:
-        # Recreate the vector store (this clears all data)
-        vector_store._create_index()
-        vector_store._save_index()
+        vector_store.clear_user_index(user_id)
         
         return APIResponse(
             success=True,
-            message="Vector database cleared successfully"
+            message="User's vector database cleared successfully"
         )
     except Exception as e:
-        logger.error(f"Error clearing database: {str(e)}", exc_info=True)
+        logger.error(f"Error clearing database for user {user_id}: {str(e)}", exc_info=True)
         raise HTTPException(status_code=500, detail=f"Failed to clear database: {str(e)}")
 
 if __name__ == "__main__":

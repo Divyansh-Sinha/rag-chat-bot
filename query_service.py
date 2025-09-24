@@ -14,18 +14,18 @@ class DataFetchingTool:
     
     def fetch_data(self, state: Dict[str, Any]) -> Dict[str, Any]:
         """
-        Fetch additional data based on configuration
-        Currently supports local vector database search
+        Fetch additional data based on configuration for a specific user.
         """
-        logger.info(f"Fetching data for query: {state['query']}")
+        user_id = state['user_id']
+        logger.info(f"Fetching data for query: {state['query']} for user: {user_id}")
         try:
             # Create embedding for the query (returns list, take first element)
             query_embeddings = embedding_service.create_embeddings([state["query"]])
             query_embedding = query_embeddings[0]  # Extract single embedding
             
-            # Search in vector store
-            results = vector_store.search(query_embedding, k=5)
-            logger.info(f"Found {len(results)} relevant documents.")
+            # Search in vector store for the specific user
+            results = vector_store.search(user_id, query_embedding, k=5)
+            logger.info(f"Found {len(results)} relevant documents for user {user_id}.")
             
             # Update state with results
             state["retrieved_docs"] = results
@@ -39,7 +39,7 @@ class DataFetchingTool:
             
             return state
         except Exception as e:
-            logger.error(f"Data fetching error: {str(e)}", exc_info=True)
+            logger.info(f"Data fetching error for user {user_id}: {str(e)}", exc_info=True)
             state["retrieved_docs"] = []
             state["context"] = ""
             return state
@@ -114,15 +114,16 @@ class RAGOrchestrator:
         
         return workflow.compile()
     
-    def process_query(self, query: str) -> Dict[str, Any]:
+    def process_query(self, query: str, user_id: str) -> Dict[str, Any]:
         """
-        Process a user query through the RAG pipeline
+        Process a user query through the RAG pipeline for a specific user.
         """
-        logger.info(f"Processing query: {query}")
+        logger.info(f"Processing query: {query} for user: {user_id}")
         try:
             # Initialize state as a dict
             initial_state = {
                 "query": query,
+                "user_id": user_id,
                 "retrieved_docs": [],
                 "context": "",
                 "answer": ""
@@ -145,11 +146,11 @@ class RAGOrchestrator:
                 "context_used": len(final_state.get("retrieved_docs", [])) > 0
             }
             
-            logger.info("Query processed successfully.")
+            logger.info(f"Query processed successfully for user {user_id}.")
             return response
             
         except Exception as e:
-            logger.error(f"Error processing query: {str(e)}", exc_info=True)
+            logger.error(f"Error processing query for user {user_id}: {str(e)}", exc_info=True)
             return {
                 "answer": f"Error processing query: {str(e)}",
                 "sources": [],

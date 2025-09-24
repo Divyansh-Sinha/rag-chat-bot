@@ -5,136 +5,157 @@ import os
 from typing import List, Dict, Any, Tuple
 from config import config
 from logging_config import logger
+import shutil
 
 class FAISSVectorStore:
     def __init__(self):
-        self.index = None
-        self.documents = []  # Store document chunks and metadata
         self.dimension = 1536  # OpenAI embedding dimension
-        self.index_path = config.VECTOR_DB_PATH
+        self.base_path = config.VECTOR_DB_PATH
+        self.indexes = {}  # Cache for user indexes: {user_id: (index, documents)}
         
-        # Create directory if it doesn't exist
-        os.makedirs(self.index_path, exist_ok=True)
-        
-        # Try to load existing index
-        self._load_index()
-    
-    def _create_index(self):
-        """Create a new FAISS index"""
-        logger.info("Creating new FAISS index.")
-        self.index = faiss.IndexFlatL2(self.dimension)
-        self.documents = []
-    
-    def _save_index(self):
-        """Save FAISS index and document metadata"""
-        try:
-            if self.index is not None:
-                # Save FAISS index
-                faiss.write_index(self.index, os.path.join(self.index_path, "faiss.index"))
-                
-                # Save document metadata
-                with open(os.path.join(self.index_path, "documents.pkl"), "wb") as f:
-                    pickle.dump(self.documents, f)
-                    
-                logger.info(f"Index saved with {len(self.documents)} documents")
-        except Exception as e:
-            logger.error(f"Failed to save index: {str(e)}", exc_info=True)
-            raise Exception(f"Failed to save index: {str(e)}")
-    
-    def _load_index(self):
-        """Load existing FAISS index and document metadata"""
-        index_file = os.path.join(self.index_path, "faiss.index")
-        docs_file = os.path.join(self.index_path, "documents.pkl")
-        
+        # Create base directory if it doesn't exist
+        os.makedirs(self.base_path, exist_ok=True)
+
+    def _get_user_index_path(self, user_id: str) -> str:
+        return os.path.join(self.base_path, user_id)
+
+    def _load_index(self, user_id: str):
+        """Load or create an index for a specific user."""
+        if user_id in self.indexes:
+            return self.indexes[user_id]
+
+        user_index_path = self._get_user_index_path(user_id)
+        index_file = os.path.join(user_index_path, "faiss.index")
+        docs_file = os.path.join(user_index_path, "documents.pkl")
+
         if os.path.exists(index_file) and os.path.exists(docs_file):
             try:
-                # Load FAISS index
-                logger.info("Loading existing index...")
-                self.index = faiss.read_index(index_file)
-                
-                # Load document metadata
+                logger.info(f"Loading existing index for user {user_id}...")
+                index = faiss.read_index(index_file)
                 with open(docs_file, "rb") as f:
-                    self.documents = pickle.load(f)
-                    
-                logger.info(f"Loaded existing index with {len(self.documents)} documents")
+                    documents = pickle.load(f)
+                logger.info(f"Loaded existing index for user {user_id} with {len(documents)} documents")
+                self.indexes[user_id] = (index, documents)
+                return index, documents
             except Exception as e:
-                logger.error(f"Failed to load existing index: {str(e)}", exc_info=True)
-                self._create_index()
+                logger.error(f"Failed to load existing index for user {user_id}: {str(e)}", exc_info=True)
+                # If loading fails, create a new one
+                return self._create_index(user_id)
         else:
-            logger.info("No existing index found. Creating a new one.")
-            self._create_index()
-    
-    def add_documents(self, processed_data: Dict[str, Any]) -> bool:
-        """Add processed document data to the vector store"""
-        logger.info(f"Adding {processed_data['total_chunks']} new chunks to the vector store.")
+            logger.info(f"No existing index found for user {user_id}. Creating a new one.")
+            return self._create_index(user_id)
+
+    def _create_index(self, user_id: str) -> Tuple[faiss.Index, List]:
+        """Create a new FAISS index for a user."""
+        user_index_path = self._get_user_index_path(user_id)
+        os.makedirs(user_index_path, exist_ok=True)
+        
+        logger.info(f"Creating new FAISS index for user {user_id}.")
+        index = faiss.IndexFlatL2(self.dimension)
+        documents = []
+        self.indexes[user_id] = (index, documents)
+        return index, documents
+
+    def _save_index(self, user_id: str):
+        """Save FAISS index and document metadata for a user."""
+        if user_id not in self.indexes:
+            logger.warning(f"Attempted to save index for user {user_id}, but it's not loaded.")
+            return
+
         try:
+            index, documents = self.indexes[user_id]
+            user_index_path = self._get_user_index_path(user_id)
+            
+            if index is not None:
+                faiss.write_index(index, os.path.join(user_index_path, "faiss.index"))
+                with open(os.path.join(user_index_path, "documents.pkl"), "wb") as f:
+                    pickle.dump(documents, f)
+                logger.info(f"Index for user {user_id} saved with {len(documents)} documents")
+        except Exception as e:
+            logger.error(f"Failed to save index for user {user_id}: {str(e)}", exc_info=True)
+            raise Exception(f"Failed to save index for user {user_id}: {str(e)}")
+
+    def add_documents(self, user_id: str, processed_data: Dict[str, Any]) -> bool:
+        """Add processed document data to a user's vector store."""
+        logger.info(f"Adding {processed_data['total_chunks']} new chunks to the vector store for user {user_id}.")
+        try:
+            index, documents = self._load_index(user_id)
+            
             embeddings = processed_data["embeddings"]
             chunks = processed_data["chunks"]
             metadata = processed_data["metadata"]
             
-            # Convert embeddings to numpy array
             embedding_matrix = np.array(embeddings, dtype=np.float32)
+            index.add(embedding_matrix)
             
-            # Add embeddings to FAISS index
-            self.index.add(embedding_matrix)
-            
-            # Store document chunks with metadata
             for i, chunk in enumerate(chunks):
                 doc_data = {
                     "chunk": chunk,
                     "metadata": metadata,
                     "chunk_index": i,
-                    "doc_id": len(self.documents)
+                    "doc_id": len(documents)
                 }
-                self.documents.append(doc_data)
+                documents.append(doc_data)
             
-            # Save the updated index
-            self._save_index()
+            self._save_index(user_id)
             
-            logger.info("Documents added successfully.")
+            logger.info(f"Documents added successfully for user {user_id}.")
             return True
         except Exception as e:
-            logger.error(f"Failed to add documents: {str(e)}", exc_info=True)
-            raise Exception(f"Failed to add documents: {str(e)}")
-    
-    def search(self, query_embedding: List[float], k: int = 5) -> List[Dict[str, Any]]:
-        """Search for similar documents"""
-        if self.index is None or len(self.documents) == 0:
-            logger.warning("Search attempted on an empty vector store.")
+            logger.error(f"Failed to add documents for user {user_id}: {str(e)}", exc_info=True)
+            raise Exception(f"Failed to add documents for user {user_id}: {str(e)}")
+
+    def search(self, user_id: str, query_embedding: List[float], k: int = 5) -> List[Dict[str, Any]]:
+        """Search for similar documents in a user's index."""
+        index, documents = self._load_index(user_id)
+        
+        if index is None or len(documents) == 0:
+            logger.warning(f"Search attempted on an empty vector store for user {user_id}.")
             return []
         
-        logger.info(f"Searching for {k} nearest neighbors.")
+        logger.info(f"Searching for {k} nearest neighbors for user {user_id}.")
         try:
-            # Convert query embedding to numpy array with proper shape
             query_vector = np.array([query_embedding], dtype=np.float32)
+            k = min(k, len(documents))
             
-            # Ensure k doesn't exceed available documents
-            k = min(k, len(self.documents))
+            distances, indices = index.search(query_vector, k)
             
-            # Search in FAISS index
-            distances, indices = self.index.search(query_vector, k)
-            
-            # Retrieve matching documents
             results = []
             for i, idx in enumerate(indices[0]):
-                if idx != -1 and idx < len(self.documents):  # Check for valid index
-                    doc = self.documents[idx].copy()
+                if idx != -1 and idx < len(documents):
+                    doc = documents[idx].copy()
                     doc["similarity_score"] = float(distances[0][i])
                     results.append(doc)
             
-            logger.info(f"Found {len(results)} matching documents.")
+            logger.info(f"Found {len(results)} matching documents for user {user_id}.")
             return results
         except Exception as e:
-            logger.error(f"Failed to search: {str(e)}", exc_info=True)
-            raise Exception(f"Failed to search: {str(e)}")
-    
-    def get_stats(self) -> Dict[str, Any]:
-        """Get vector store statistics"""
+            logger.error(f"Failed to search for user {user_id}: {str(e)}", exc_info=True)
+            raise Exception(f"Failed to search for user {user_id}: {str(e)}")
+
+    def get_stats(self, user_id: str) -> Dict[str, Any]:
+        """Get vector store statistics for a user."""
+        index, documents = self._load_index(user_id)
         return {
-            "total_documents": len(self.documents),
-            "index_size": self.index.ntotal if self.index else 0,
+            "user_id": user_id,
+            "total_documents": len(documents),
+            "index_size": index.ntotal if index else 0,
             "dimension": self.dimension
         }
+
+    def clear_user_index(self, user_id: str):
+        """Clear all documents from a user's vector database."""
+        user_index_path = self._get_user_index_path(user_id)
+        if user_id in self.indexes:
+            del self.indexes[user_id]
+        
+        if os.path.exists(user_index_path):
+            shutil.rmtree(user_index_path)
+            logger.info(f"Cleared vector database for user {user_id}")
+        
+        # Re-create an empty index in memory
+        self._create_index(user_id)
+        self._save_index(user_id)
 
 # Initialize vector store
 vector_store = FAISSVectorStore()
