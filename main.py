@@ -268,17 +268,23 @@ async def query_documents(request: QueryRequest, user_id: str = Depends(get_curr
         raise HTTPException(status_code=500, detail=f"Query processing failed: {str(e)}")
 
 @app.delete("/clear")
-async def clear_database(user_id: str = Depends(get_current_user_id_from_api_key)):
+async def clear_database(user_id: str = Depends(get_current_user)):
     """
     Clear all documents from the vector database for the current user.
     """
     try:
-        vector_store.clear_user_index(user_id)
+        deleted = vector_store.clear_user_index(user_id)
         
-        return APIResponse(
-            success=True,
-            message="User's vector database cleared successfully"
-        )
+        if deleted:
+            return APIResponse(
+                success=True,
+                message="User's vector database cleared successfully"
+            )
+        else:
+            return APIResponse(
+                success=True,
+                message="No data found for the user to clear."
+            )
     except Exception as e:
         logger.error(f"Error clearing database for user {user_id}: {str(e)}", exc_info=True)
         raise HTTPException(status_code=500, detail=f"Failed to clear database: {str(e)}")

@@ -143,19 +143,22 @@ class FAISSVectorStore:
             "dimension": self.dimension
         }
 
-    def clear_user_index(self, user_id: str):
-        """Clear all documents from a user's vector database."""
+    def clear_user_index(self, user_id: str) -> bool:
+        """
+        Clear all documents from a user's vector database by deleting their data directory.
+        Returns True if the directory was deleted, False otherwise.
+        """
         user_index_path = self._get_user_index_path(user_id)
         if user_id in self.indexes:
             del self.indexes[user_id]
         
         if os.path.exists(user_index_path):
             shutil.rmtree(user_index_path)
-            logger.info(f"Cleared vector database for user {user_id}")
+            logger.info(f"Deleted user data directory for user {user_id}")
+            return True
         
-        # Re-create an empty index in memory
-        self._create_index(user_id)
-        self._save_index(user_id)
+        logger.info(f"No data directory found for user {user_id}. Nothing to clear.")
+        return False
 
 # Initialize vector store
 vector_store = FAISSVectorStore()

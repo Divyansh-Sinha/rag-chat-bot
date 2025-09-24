@@ -191,3 +191,36 @@ class RAGOrchestrator:
 ```
 
 This multi-tenant architecture ensures that each user's data is securely isolated, providing a robust and scalable solution for the RAG API.
+
+## 5. Data Management
+
+### 5.1. Clearing User Data
+
+Users can clear all their indexed documents from the vector store. This action requires a valid Firebase ID token for authentication. The system first checks if any data exists for the user before proceeding with the deletion.
+
+*Relevant Endpoint (`main.py`):*
+```python
+@app.delete("/clear")
+async def clear_database(user_id: str = Depends(get_current_user)):
+    """
+    Clear all documents from the vector database for the current user.
+    """
+    try:
+        # Check if there are any embeddings for the user
+        stats = vector_store.get_stats(user_id)
+        if stats.get("index_size", 0) == 0:
+            return APIResponse(
+                success=True,
+                message="No vector embeddings found to clear."
+            )
+
+        vector_store.clear_user_index(user_id)
+        
+        return APIResponse(
+            success=True,
+            message="User's vector database cleared successfully"
+        )
+    except Exception as e:
+        logger.error(f"Error clearing database for user {user_id}: {str(e)}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Failed to clear database: {str(e)}")
+```

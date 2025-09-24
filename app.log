@@ -446,3 +446,322 @@ Traceback (most recent call last):
   File "D:\rag\rag_chat_bot\rag-chat-bot\venv\Lib\site-packages\firebase_admin\_token_gen.py", line 408, in verify
     raise self._expired_token_error(str(error), cause=error)
 firebase_admin._token_gen.ExpiredIdTokenError: Token expired, 1758658081 < 1758658319
+2025-09-24 21:59:02,203 - ERROR - root - firebase_admin_auth - verify_firebase_token - 34 - Invalid Firebase token: Token expired, 1758703905 < 1758731342
+Traceback (most recent call last):
+  File "D:\Repositories\GEN AI\rag\venv\Lib\site-packages\firebase_admin\_token_gen.py", line 396, in verify
+    verified_claims = google.oauth2.id_token.verify_token(
+        token,
+    ...<2 lines>...
+        certs_url=self.cert_url,
+        clock_skew_in_seconds=clock_skew_seconds)
+  File "D:\Repositories\GEN AI\rag\venv\Lib\site-packages\google\oauth2\id_token.py", line 150, in verify_token
+    return jwt.decode(
+           ~~~~~~~~~~^
+        id_token,
+        ^^^^^^^^^
+    ...<2 lines>...
+        clock_skew_in_seconds=clock_skew_in_seconds,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "D:\Repositories\GEN AI\rag\venv\Lib\site-packages\google\auth\jwt.py", line 302, in decode
+    _verify_iat_and_exp(payload, clock_skew_in_seconds)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Repositories\GEN AI\rag\venv\Lib\site-packages\google\auth\jwt.py", line 228, in _verify_iat_and_exp
+    raise exceptions.InvalidValue("Token expired, {} < {}".format(latest, now))
+google.auth.exceptions.InvalidValue: Token expired, 1758703905 < 1758731342
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\Repositories\GEN AI\rag\firebase_admin_auth.py", line 31, in verify_firebase_token
+    decoded_token = auth.verify_id_token(token)
+  File "D:\Repositories\GEN AI\rag\venv\Lib\site-packages\firebase_admin\auth.py", line 227, in verify_id_token
+    return client.verify_id_token(
+           ~~~~~~~~~~~~~~~~~~~~~~^
+        id_token, check_revoked=check_revoked, clock_skew_seconds=clock_skew_seconds)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Repositories\GEN AI\rag\venv\Lib\site-packages\firebase_admin\_auth_client.py", line 130, in verify_id_token
+    verified_claims = self._token_verifier.verify_id_token(id_token, clock_skew_seconds)
+  File "D:\Repositories\GEN AI\rag\venv\Lib\site-packages\firebase_admin\_token_gen.py", line 293, in verify_id_token
+    return self.id_token_verifier.verify(id_token, self.request, clock_skew_seconds)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Repositories\GEN AI\rag\venv\Lib\site-packages\firebase_admin\_token_gen.py", line 408, in verify
+    raise self._expired_token_error(str(error), cause=error)
+firebase_admin._token_gen.ExpiredIdTokenError: Token expired, 1758703905 < 1758731342
+2025-09-24 21:59:18,707 - ERROR - root - firebase_admin_auth - login_with_email_and_password - 137 - Failed to login user: {
+  "error": {
+    "code": 400,
+    "message": "INVALID_LOGIN_CREDENTIALS",
+    "errors": [
+      {
+        "message": "INVALID_LOGIN_CREDENTIALS",
+        "domain": "global",
+        "reason": "invalid"
+      }
+    ]
+  }
+}
+Traceback (most recent call last):
+  File "D:\Repositories\GEN AI\rag\firebase_admin_auth.py", line 130, in login_with_email_and_password
+    response.raise_for_status()  # Raise an exception for bad status codes
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "D:\Repositories\GEN AI\rag\venv\Lib\site-packages\requests\models.py", line 1026, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 400 Client Error: Bad Request for url: https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyAUA01g7RrFEdz9tpFpmEiEVB0UV5RP1_w
+2025-09-24 21:59:24,232 - ERROR - root - firebase_admin_auth - login_with_email_and_password - 137 - Failed to login user: {
+  "error": {
+    "code": 400,
+    "message": "INVALID_LOGIN_CREDENTIALS",
+    "errors": [
+      {
+        "message": "INVALID_LOGIN_CREDENTIALS",
+        "domain": "global",
+        "reason": "invalid"
+      }
+    ]
+  }
+}
+Traceback (most recent call last):
+  File "D:\Repositories\GEN AI\rag\firebase_admin_auth.py", line 130, in login_with_email_and_password
+    response.raise_for_status()  # Raise an exception for bad status codes
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "D:\Repositories\GEN AI\rag\venv\Lib\site-packages\requests\models.py", line 1026, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 400 Client Error: Bad Request for url: https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyAUA01g7RrFEdz9tpFpmEiEVB0UV5RP1_w
+2025-09-24 21:59:47,035 - ERROR - root - firebase_admin_auth - login_with_email_and_password - 137 - Failed to login user: {
+  "error": {
+    "code": 400,
+    "message": "INVALID_LOGIN_CREDENTIALS",
+    "errors": [
+      {
+        "message": "INVALID_LOGIN_CREDENTIALS",
+        "domain": "global",
+        "reason": "invalid"
+      }
+    ]
+  }
+}
+Traceback (most recent call last):
+  File "D:\Repositories\GEN AI\rag\firebase_admin_auth.py", line 130, in login_with_email_and_password
+    response.raise_for_status()  # Raise an exception for bad status codes
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "D:\Repositories\GEN AI\rag\venv\Lib\site-packages\requests\models.py", line 1026, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 400 Client Error: Bad Request for url: https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyAUA01g7RrFEdz9tpFpmEiEVB0UV5RP1_w
+2025-09-24 21:59:51,137 - ERROR - root - firebase_admin_auth - login_with_email_and_password - 137 - Failed to login user: {
+  "error": {
+    "code": 400,
+    "message": "INVALID_LOGIN_CREDENTIALS",
+    "errors": [
+      {
+        "message": "INVALID_LOGIN_CREDENTIALS",
+        "domain": "global",
+        "reason": "invalid"
+      }
+    ]
+  }
+}
+Traceback (most recent call last):
+  File "D:\Repositories\GEN AI\rag\firebase_admin_auth.py", line 130, in login_with_email_and_password
+    response.raise_for_status()  # Raise an exception for bad status codes
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "D:\Repositories\GEN AI\rag\venv\Lib\site-packages\requests\models.py", line 1026, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 400 Client Error: Bad Request for url: https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyAUA01g7RrFEdz9tpFpmEiEVB0UV5RP1_w
+2025-09-24 22:00:10,223 - ERROR - root - firebase_admin_auth - verify_firebase_token - 34 - Invalid Firebase token: Token used too early, 1758731410 < 1758731411. Check that your computer's clock is set correctly.
+Traceback (most recent call last):
+  File "D:\Repositories\GEN AI\rag\venv\Lib\site-packages\firebase_admin\_token_gen.py", line 396, in verify
+    verified_claims = google.oauth2.id_token.verify_token(
+        token,
+    ...<2 lines>...
+        certs_url=self.cert_url,
+        clock_skew_in_seconds=clock_skew_seconds)
+  File "D:\Repositories\GEN AI\rag\venv\Lib\site-packages\google\oauth2\id_token.py", line 150, in verify_token
+    return jwt.decode(
+           ~~~~~~~~~~^
+        id_token,
+        ^^^^^^^^^
+    ...<2 lines>...
+        clock_skew_in_seconds=clock_skew_in_seconds,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "D:\Repositories\GEN AI\rag\venv\Lib\site-packages\google\auth\jwt.py", line 302, in decode
+    _verify_iat_and_exp(payload, clock_skew_in_seconds)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Repositories\GEN AI\rag\venv\Lib\site-packages\google\auth\jwt.py", line 216, in _verify_iat_and_exp
+    raise exceptions.InvalidValue(
+    ...<3 lines>...
+    )
+google.auth.exceptions.InvalidValue: Token used too early, 1758731410 < 1758731411. Check that your computer's clock is set correctly.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\Repositories\GEN AI\rag\firebase_admin_auth.py", line 31, in verify_firebase_token
+    decoded_token = auth.verify_id_token(token)
+  File "D:\Repositories\GEN AI\rag\venv\Lib\site-packages\firebase_admin\auth.py", line 227, in verify_id_token
+    return client.verify_id_token(
+           ~~~~~~~~~~~~~~~~~~~~~~^
+        id_token, check_revoked=check_revoked, clock_skew_seconds=clock_skew_seconds)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Repositories\GEN AI\rag\venv\Lib\site-packages\firebase_admin\_auth_client.py", line 130, in verify_id_token
+    verified_claims = self._token_verifier.verify_id_token(id_token, clock_skew_seconds)
+  File "D:\Repositories\GEN AI\rag\venv\Lib\site-packages\firebase_admin\_token_gen.py", line 293, in verify_id_token
+    return self.id_token_verifier.verify(id_token, self.request, clock_skew_seconds)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Repositories\GEN AI\rag\venv\Lib\site-packages\firebase_admin\_token_gen.py", line 409, in verify
+    raise self._invalid_token_error(str(error), cause=error)
+firebase_admin._auth_utils.InvalidIdTokenError: Token used too early, 1758731410 < 1758731411. Check that your computer's clock is set correctly.
+2025-09-24 22:14:36,031 - ERROR - root - firebase_admin_auth - verify_firebase_token - 34 - Invalid Firebase token: Token expired, 1758703905 < 1758732276
+Traceback (most recent call last):
+  File "D:\Repositories\GEN AI\rag\venv\Lib\site-packages\firebase_admin\_token_gen.py", line 396, in verify
+    verified_claims = google.oauth2.id_token.verify_token(
+        token,
+    ...<2 lines>...
+        certs_url=self.cert_url,
+        clock_skew_in_seconds=clock_skew_seconds)
+  File "D:\Repositories\GEN AI\rag\venv\Lib\site-packages\google\oauth2\id_token.py", line 150, in verify_token
+    return jwt.decode(
+           ~~~~~~~~~~^
+        id_token,
+        ^^^^^^^^^
+    ...<2 lines>...
+        clock_skew_in_seconds=clock_skew_in_seconds,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "D:\Repositories\GEN AI\rag\venv\Lib\site-packages\google\auth\jwt.py", line 302, in decode
+    _verify_iat_and_exp(payload, clock_skew_in_seconds)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Repositories\GEN AI\rag\venv\Lib\site-packages\google\auth\jwt.py", line 228, in _verify_iat_and_exp
+    raise exceptions.InvalidValue("Token expired, {} < {}".format(latest, now))
+google.auth.exceptions.InvalidValue: Token expired, 1758703905 < 1758732276
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\Repositories\GEN AI\rag\firebase_admin_auth.py", line 31, in verify_firebase_token
+    decoded_token = auth.verify_id_token(token)
+  File "D:\Repositories\GEN AI\rag\venv\Lib\site-packages\firebase_admin\auth.py", line 227, in verify_id_token
+    return client.verify_id_token(
+           ~~~~~~~~~~~~~~~~~~~~~~^
+        id_token, check_revoked=check_revoked, clock_skew_seconds=clock_skew_seconds)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Repositories\GEN AI\rag\venv\Lib\site-packages\firebase_admin\_auth_client.py", line 130, in verify_id_token
+    verified_claims = self._token_verifier.verify_id_token(id_token, clock_skew_seconds)
+  File "D:\Repositories\GEN AI\rag\venv\Lib\site-packages\firebase_admin\_token_gen.py", line 293, in verify_id_token
+    return self.id_token_verifier.verify(id_token, self.request, clock_skew_seconds)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Repositories\GEN AI\rag\venv\Lib\site-packages\firebase_admin\_token_gen.py", line 408, in verify
+    raise self._expired_token_error(str(error), cause=error)
+firebase_admin._token_gen.ExpiredIdTokenError: Token expired, 1758703905 < 1758732276
+2025-09-24 22:14:36,039 - ERROR - root - firebase_admin_auth - verify_firebase_token - 34 - Invalid Firebase token: Token expired, 1758703905 < 1758732276
+Traceback (most recent call last):
+  File "D:\Repositories\GEN AI\rag\venv\Lib\site-packages\firebase_admin\_token_gen.py", line 396, in verify
+    verified_claims = google.oauth2.id_token.verify_token(
+        token,
+    ...<2 lines>...
+        certs_url=self.cert_url,
+        clock_skew_in_seconds=clock_skew_seconds)
+  File "D:\Repositories\GEN AI\rag\venv\Lib\site-packages\google\oauth2\id_token.py", line 150, in verify_token
+    return jwt.decode(
+           ~~~~~~~~~~^
+        id_token,
+        ^^^^^^^^^
+    ...<2 lines>...
+        clock_skew_in_seconds=clock_skew_in_seconds,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "D:\Repositories\GEN AI\rag\venv\Lib\site-packages\google\auth\jwt.py", line 302, in decode
+    _verify_iat_and_exp(payload, clock_skew_in_seconds)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Repositories\GEN AI\rag\venv\Lib\site-packages\google\auth\jwt.py", line 228, in _verify_iat_and_exp
+    raise exceptions.InvalidValue("Token expired, {} < {}".format(latest, now))
+google.auth.exceptions.InvalidValue: Token expired, 1758703905 < 1758732276
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\Repositories\GEN AI\rag\firebase_admin_auth.py", line 31, in verify_firebase_token
+    decoded_token = auth.verify_id_token(token)
+  File "D:\Repositories\GEN AI\rag\venv\Lib\site-packages\firebase_admin\auth.py", line 227, in verify_id_token
+    return client.verify_id_token(
+           ~~~~~~~~~~~~~~~~~~~~~~^
+        id_token, check_revoked=check_revoked, clock_skew_seconds=clock_skew_seconds)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Repositories\GEN AI\rag\venv\Lib\site-packages\firebase_admin\_auth_client.py", line 130, in verify_id_token
+    verified_claims = self._token_verifier.verify_id_token(id_token, clock_skew_seconds)
+  File "D:\Repositories\GEN AI\rag\venv\Lib\site-packages\firebase_admin\_token_gen.py", line 293, in verify_id_token
+    return self.id_token_verifier.verify(id_token, self.request, clock_skew_seconds)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Repositories\GEN AI\rag\venv\Lib\site-packages\firebase_admin\_token_gen.py", line 408, in verify
+    raise self._expired_token_error(str(error), cause=error)
+firebase_admin._token_gen.ExpiredIdTokenError: Token expired, 1758703905 < 1758732276
+2025-09-24 22:15:53,866 - ERROR - root - firebase_admin_auth - login_with_email_and_password - 137 - Failed to login user: {
+  "error": {
+    "code": 400,
+    "message": "INVALID_LOGIN_CREDENTIALS",
+    "errors": [
+      {
+        "message": "INVALID_LOGIN_CREDENTIALS",
+        "domain": "global",
+        "reason": "invalid"
+      }
+    ]
+  }
+}
+Traceback (most recent call last):
+  File "D:\Repositories\GEN AI\rag\firebase_admin_auth.py", line 130, in login_with_email_and_password
+    response.raise_for_status()  # Raise an exception for bad status codes
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "D:\Repositories\GEN AI\rag\venv\Lib\site-packages\requests\models.py", line 1026, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 400 Client Error: Bad Request for url: https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyAUA01g7RrFEdz9tpFpmEiEVB0UV5RP1_w
+2025-09-24 22:16:41,445 - ERROR - root - firebase_admin_auth - verify_firebase_token - 34 - Invalid Firebase token: Token used too early, 1758732401 < 1758732402. Check that your computer's clock is set correctly.
+Traceback (most recent call last):
+  File "D:\Repositories\GEN AI\rag\venv\Lib\site-packages\firebase_admin\_token_gen.py", line 396, in verify
+    verified_claims = google.oauth2.id_token.verify_token(
+        token,
+    ...<2 lines>...
+        certs_url=self.cert_url,
+        clock_skew_in_seconds=clock_skew_seconds)
+  File "D:\Repositories\GEN AI\rag\venv\Lib\site-packages\google\oauth2\id_token.py", line 150, in verify_token
+    return jwt.decode(
+           ~~~~~~~~~~^
+        id_token,
+        ^^^^^^^^^
+    ...<2 lines>...
+        clock_skew_in_seconds=clock_skew_in_seconds,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "D:\Repositories\GEN AI\rag\venv\Lib\site-packages\google\auth\jwt.py", line 302, in decode
+    _verify_iat_and_exp(payload, clock_skew_in_seconds)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Repositories\GEN AI\rag\venv\Lib\site-packages\google\auth\jwt.py", line 216, in _verify_iat_and_exp
+    raise exceptions.InvalidValue(
+    ...<3 lines>...
+    )
+google.auth.exceptions.InvalidValue: Token used too early, 1758732401 < 1758732402. Check that your computer's clock is set correctly.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\Repositories\GEN AI\rag\firebase_admin_auth.py", line 31, in verify_firebase_token
+    decoded_token = auth.verify_id_token(token)
+  File "D:\Repositories\GEN AI\rag\venv\Lib\site-packages\firebase_admin\auth.py", line 227, in verify_id_token
+    return client.verify_id_token(
+           ~~~~~~~~~~~~~~~~~~~~~~^
+        id_token, check_revoked=check_revoked, clock_skew_seconds=clock_skew_seconds)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Repositories\GEN AI\rag\venv\Lib\site-packages\firebase_admin\_auth_client.py", line 130, in verify_id_token
+    verified_claims = self._token_verifier.verify_id_token(id_token, clock_skew_seconds)
+  File "D:\Repositories\GEN AI\rag\venv\Lib\site-packages\firebase_admin\_token_gen.py", line 293, in verify_id_token
+    return self.id_token_verifier.verify(id_token, self.request, clock_skew_seconds)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Repositories\GEN AI\rag\venv\Lib\site-packages\firebase_admin\_token_gen.py", line 409, in verify
+    raise self._invalid_token_error(str(error), cause=error)
+firebase_admin._auth_utils.InvalidIdTokenError: Token used too early, 1758732401 < 1758732402. Check that your computer's clock is set correctly.
